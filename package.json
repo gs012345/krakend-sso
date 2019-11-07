@@ -1,0 +1,48 @@
+{
+  "version": 2,
+  "name": "My lovely gateway",
+  "port": 8080,
+  "cache_ttl": 3600,
+  "timeout": "3s",
+  "extra_config": {
+    "github_com/devopsfaith/krakend-gologging": {
+      "level":  "DEBUG",
+      "prefix": "[KRAKEND]",
+      "syslog": false,
+      "stdout": true
+    }
+  },
+  "endpoints": [
+    {
+      "endpoint": "/world",
+      "method": "GET",
+      "headers_to_pass": [
+        "Sso", "X-Sso-Fullticketid"
+      ],
+      "backend": [
+        {
+          "host": [
+            "http://127.0.0.1:9090"
+          ],
+          "url_pattern": "/world",
+          "extra_config": {
+            "github.com/devopsfaith/krakend-martian": {
+              "fifo.Group": {
+                "scope": ["request", "response"],
+                "aggregateErrors": true,
+                "modifiers": [
+                  {
+                    "body.Modifier": {
+                      "scope": ["request","response"],
+                      "body": "eyJtc2ciOiJ5b3Ugcm9jayEifQ=="
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
